@@ -1,18 +1,15 @@
-
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Store, MapPin, BarChart3, MoreHorizontal, Plus } from 'lucide-react';
+import { Search, Store, MapPin, MoreHorizontal, Plus } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-// Mock data for stores
 const stores = [
   { 
     id: 1, 
@@ -52,7 +49,6 @@ const AdminStores = () => {
   const [selectedStore, setSelectedStore] = useState<any>(null);
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
   
-  // Get all branches across all stores
   const allBranches = stores.flatMap(store => 
     store.branches.map(branch => ({
       ...branch,
@@ -61,7 +57,6 @@ const AdminStores = () => {
     }))
   );
   
-  // Filter branches based on search and store filter
   const filteredBranches = allBranches.filter(branch => {
     const matchesSearch = 
       branch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -76,9 +71,9 @@ const AdminStores = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Stores & Branches</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Stores</h1>
         <p className="text-muted-foreground">
-          Manage store franchises and their branches
+          Manage store locations
         </p>
       </div>
 
@@ -102,7 +97,7 @@ const AdminStores = () => {
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               type="search"
-              placeholder="Search branches..."
+              placeholder="Search locations..."
               className="pl-8"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -113,14 +108,14 @@ const AdminStores = () => {
             <DialogTrigger asChild>
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Add Branch
+                Add Location
               </Button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Add New Branch</DialogTitle>
+                <DialogTitle>Add New Location</DialogTitle>
                 <DialogDescription>
-                  Add a new branch to an existing store franchise.
+                  Add a new location to an existing store franchise.
                 </DialogDescription>
               </DialogHeader>
               
@@ -143,16 +138,10 @@ const AdminStores = () => {
                   </Select>
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="branchName" className="text-right">
-                    Branch Name
+                  <Label htmlFor="locationName" className="text-right">
+                    Location Name
                   </Label>
-                  <Input id="branchName" placeholder="Branch Name" className="col-span-3" />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="location" className="text-right">
-                    Location
-                  </Label>
-                  <Input id="location" placeholder="Location" className="col-span-3" />
+                  <Input id="locationName" placeholder="Location Name" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="address" className="text-right">
@@ -163,7 +152,7 @@ const AdminStores = () => {
               </div>
               
               <DialogFooter>
-                <Button type="submit">Add Branch</Button>
+                <Button type="submit">Add Location</Button>
               </DialogFooter>
             </DialogContent>
           </Dialog>
@@ -171,21 +160,13 @@ const AdminStores = () => {
       </div>
 
       <Card>
-        <CardHeader className="p-4 border-b">
-          <Tabs defaultValue="branches">
-            <TabsList>
-              <TabsTrigger value="branches">Branches</TabsTrigger>
-              <TabsTrigger value="franchises">Franchises</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Branch Name</TableHead>
+                <TableHead>Location Name</TableHead>
                 <TableHead>Store</TableHead>
-                <TableHead>Location</TableHead>
+                <TableHead>Address</TableHead>
                 <TableHead className="text-right">Services This Month</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -307,9 +288,9 @@ const AdminStores = () => {
           {filteredBranches.length === 0 && (
             <div className="flex flex-col items-center justify-center h-60">
               <Store className="h-10 w-10 text-muted-foreground/40 mb-4" />
-              <h3 className="text-lg font-medium">No branches found</h3>
+              <h3 className="text-lg font-medium">No locations found</h3>
               <p className="text-sm text-muted-foreground">
-                No branches match your current search criteria.
+                No locations match your current search criteria.
               </p>
             </div>
           )}
@@ -325,7 +306,7 @@ const AdminStores = () => {
                 <Badge variant="outline">{store.type}</Badge>
               </CardTitle>
               <CardDescription>
-                {store.branches.length} branches
+                {store.branches.length} locations
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -345,11 +326,6 @@ const AdminStores = () => {
                     </div>
                   ))}
                 </div>
-                
-                <Button variant="ghost" size="sm" className="w-full">
-                  <BarChart3 className="mr-2 h-4 w-4" />
-                  View Reports
-                </Button>
               </div>
             </CardContent>
           </Card>
