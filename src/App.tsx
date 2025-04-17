@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -18,6 +19,7 @@ import TechnicianHistory from "./pages/technician/History";
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminTechnicians from "./pages/admin/Technicians";
+import AdminAccounts from "./pages/admin/AdminAccounts";
 import AdminStores from "./pages/admin/Stores";
 import AdminReports from "./pages/admin/Reports";
 
@@ -51,6 +53,7 @@ const App = () => (
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<AdminDashboard />} />
             <Route path="technicians" element={<AdminTechnicians />} />
+            <Route path="accounts" element={<AdminAccounts />} />
             <Route path="stores" element={<AdminStores />} />
             <Route path="reports" element={<AdminReports />} />
           </Route>

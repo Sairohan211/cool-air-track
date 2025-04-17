@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useToast } from "@/components/ui/use-toast";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 
 // Mock data for technicians
 const technicians = [
@@ -114,8 +116,19 @@ const AdminTechnicians = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedTechnician, setSelectedTechnician] = useState<any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { toast } = useToast();
   
-  // Filter technicians based on search and status filter
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      techId: "",
+      passcode: ""
+    }
+  });
+
   const filteredTechnicians = technicians.filter(tech => {
     const matchesSearch = 
       tech.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -139,6 +152,27 @@ const AdminTechnicians = () => {
 
   const technicianActivities = (techId: string) => {
     return recentActivities.filter(activity => activity.technicianId === techId);
+  };
+
+  const onSubmit = (data: any) => {
+    console.log("New technician data:", data);
+    
+    if (!data.techId) {
+      data.techId = `T${String(technicians.length + 1).padStart(3, '0')}`;
+    }
+    
+    toast({
+      title: "Success!",
+      description: `Technician ${data.name} added with ID: ${data.techId}`,
+    });
+    
+    form.reset();
+    setIsDialogOpen(false);
+  };
+
+  const generateRandomPasscode = () => {
+    const passcode = Math.floor(100000 + Math.random() * 900000).toString();
+    form.setValue("passcode", passcode);
   };
 
   return (
@@ -170,7 +204,7 @@ const AdminTechnicians = () => {
               />
             </div>
             
-            <Dialog>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button>
                   <UserPlus className="mr-2 h-4 w-4" />
@@ -185,30 +219,99 @@ const AdminTechnicians = () => {
                   </DialogDescription>
                 </DialogHeader>
                 
-                <div className="grid gap-4 py-4">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="name" className="text-right">
-                      Name
-                    </Label>
-                    <Input id="name" placeholder="Full Name" className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="email" className="text-right">
-                      Email
-                    </Label>
-                    <Input id="email" placeholder="Email Address" className="col-span-3" />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="phone" className="text-right">
-                      Phone
-                    </Label>
-                    <Input id="phone" placeholder="Phone Number" className="col-span-3" />
-                  </div>
-                </div>
-                
-                <DialogFooter>
-                  <Button type="submit">Add Technician</Button>
-                </DialogFooter>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Full Name" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Email Address" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Phone Number" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="techId"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Technician ID (Optional)</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. T001" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="passcode"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Passcode</FormLabel>
+                            <div className="flex gap-2">
+                              <FormControl>
+                                <Input
+                                  type="text"
+                                  placeholder="6-digit code"
+                                  {...field}
+                                />
+                              </FormControl>
+                              <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={generateRandomPasscode}
+                                size="sm"
+                              >
+                                Generate
+                              </Button>
+                            </div>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <DialogFooter>
+                      <Button type="submit">Add Technician</Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
               </DialogContent>
             </Dialog>
           </div>
