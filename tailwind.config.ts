@@ -28,6 +28,19 @@ export default {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+                // AC Services theme colors
+                acblue: {
+                    50: '#e6f7ff',
+                    100: '#b3e0ff',
+                    200: '#80caff',
+                    300: '#4db3ff',
+                    400: '#1a9cff',
+                    500: '#0080ff',
+                    600: '#0060cc',
+                    700: '#004099',
+                    800: '#002066',
+                    900: '#001033',
+                },
 				secondary: {
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
