@@ -9,6 +9,7 @@ import { lazy, Suspense } from "react";
 // Auth Pages
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import Index from "./pages/Index";
 
 // App Pages
 import TechnicianDashboard from "./pages/technician/Dashboard";
@@ -38,7 +39,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/" element={<Login />} />
+          <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           
           {/* Technician Routes */}

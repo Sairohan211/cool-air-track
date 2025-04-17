@@ -1,11 +1,14 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AirVent } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { toast } from '@/hooks/use-toast';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -14,6 +17,18 @@ const Login = () => {
   const [adminUsername, setAdminUsername] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showFirstTimeSetup, setShowFirstTimeSetup] = useState(false);
+  const [isFirstTimeDialogOpen, setIsFirstTimeDialogOpen] = useState(false);
+  const [setupAdminName, setSetupAdminName] = useState('');
+  const [setupAdminUsername, setSetupAdminUsername] = useState('');
+  const [setupAdminPassword, setSetupAdminPassword] = useState('');
+  const [setupAdminPasswordConfirm, setSetupAdminPasswordConfirm] = useState('');
+
+  // Check if there's any admin account (using localStorage as a simple way to demonstrate)
+  useEffect(() => {
+    const hasExistingAdmin = localStorage.getItem('adminAccounts');
+    setShowFirstTimeSetup(!hasExistingAdmin || hasExistingAdmin === '[]');
+  }, []);
 
   const handleTechnicianLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,11 +45,70 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     
-    // In a real application, we would authenticate against a backend here
-    setTimeout(() => {
-      navigate('/admin');
+    // Check if admin exists in local storage
+    const admins = JSON.parse(localStorage.getItem('adminAccounts') || '[]');
+    const adminExists = admins.some(
+      (admin: any) => admin.username === adminUsername && admin.password === adminPassword
+    );
+
+    if (adminExists) {
+      setTimeout(() => {
+        navigate('/admin');
+        setLoading(false);
+      }, 1000);
+    } else {
       setLoading(false);
-    }, 1000);
+      toast({
+        title: "Login Failed",
+        description: "Invalid username or password.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleSetupFirstAdmin = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (setupAdminPassword !== setupAdminPasswordConfirm) {
+      toast({
+        title: "Password Mismatch",
+        description: "The passwords you entered don't match.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (setupAdminPassword.length < 6) {
+      toast({
+        title: "Password Too Short",
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Create the first admin account
+    const firstAdmin = {
+      name: setupAdminName,
+      username: setupAdminUsername,
+      password: setupAdminPassword,
+      role: 'admin',
+      isActive: true,
+      createdAt: new Date().toISOString()
+    };
+
+    // Store in localStorage (in a real app, this would be in a secure database)
+    localStorage.setItem('adminAccounts', JSON.stringify([firstAdmin]));
+    
+    // Close the dialog and update state
+    setIsFirstTimeDialogOpen(false);
+    setShowFirstTimeSetup(false);
+    
+    toast({
+      title: "Admin Account Created",
+      description: "You can now log in with your new admin account.",
+      variant: "default"
+    });
   };
 
   return (
@@ -127,6 +201,20 @@ const Login = () => {
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? 'Logging in...' : 'Login as Admin'}
                     </Button>
+                    
+                    {showFirstTimeSetup && (
+                      <div className="mt-4 pt-4 border-t text-center">
+                        <p className="text-sm text-gray-500 mb-2">First time using the system?</p>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => setIsFirstTimeDialogOpen(true)}
+                          className="w-full"
+                        >
+                          Set Up First Admin Account
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 </form>
               </TabsContent>
@@ -134,6 +222,80 @@ const Login = () => {
           </Tabs>
         </Card>
       </div>
+
+      {/* First-time setup dialog */}
+      <Dialog open={isFirstTimeDialogOpen} onOpenChange={setIsFirstTimeDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create First Admin Account</DialogTitle>
+            <DialogDescription>
+              This account will have full administrative access to the system.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <form onSubmit={handleSetupFirstAdmin}>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="setupName" className="text-right">
+                  Full Name
+                </Label>
+                <Input
+                  id="setupName"
+                  value={setupAdminName}
+                  onChange={(e) => setSetupAdminName(e.target.value)}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="setupUsername" className="text-right">
+                  Username
+                </Label>
+                <Input
+                  id="setupUsername"
+                  value={setupAdminUsername}
+                  onChange={(e) => setSetupAdminUsername(e.target.value)}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="setupPassword" className="text-right">
+                  Password
+                </Label>
+                <Input
+                  id="setupPassword"
+                  type="password"
+                  value={setupAdminPassword}
+                  onChange={(e) => setSetupAdminPassword(e.target.value)}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="setupPasswordConfirm" className="text-right">
+                  Confirm
+                </Label>
+                <Input
+                  id="setupPasswordConfirm"
+                  type="password"
+                  value={setupAdminPasswordConfirm}
+                  onChange={(e) => setSetupAdminPasswordConfirm(e.target.value)}
+                  className="col-span-3"
+                  required
+                />
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsFirstTimeDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button type="submit">Create Admin Account</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
