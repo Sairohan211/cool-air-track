@@ -1,6 +1,6 @@
 
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, Store, BarChart, LogOut, Menu, X } from 'lucide-react';
+import { Home, Users, Store, BarChart, LogOut, Menu, X, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 
 const AdminLayout = () => {
