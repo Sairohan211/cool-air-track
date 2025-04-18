@@ -1,6 +1,6 @@
 
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Users, Store, BarChart, LogOut, Menu, X, Briefcase } from 'lucide-react';
+import { Home, Users, Store, BarChart, LogOut, Menu, X, Briefcase, CreditCard } from 'lucide-react';
 import { useState } from 'react';
 
 const AdminLayout = () => {
@@ -77,6 +77,12 @@ const AdminLayout = () => {
                 icon={<Store size={20} />} 
                 label="Stores" 
                 active={location.pathname === '/admin/stores'} 
+              />
+              <NavItem 
+                to="/admin/amc-customers" 
+                icon={<CreditCard size={20} />} 
+                label="AMC Customers" 
+                active={location.pathname === '/admin/amc-customers'} 
               />
               <NavItem 
                 to="/admin/reports" 
