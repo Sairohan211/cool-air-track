@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Store, MapPin, MoreHorizontal, Plus, UserPlus } from 'lucide-react';
+import { Search, Store, MapPin, MoreHorizontal, Plus, UserPlus, Phone } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -15,36 +15,99 @@ const stores = [
     id: 1, 
     name: "Lifestyle", 
     type: "Franchise",
-    logo: "/placeholder.svg",
+    logo: "https://raw.githubusercontent.com/dhanushkunapareddy/slv-climate-max-stores/main/assets/img/logo.png",
     phone: "+91 40 6610 1234",
     branches: [
-      { id: 101, name: "Hyderabad Central", location: "Punjagutta Road", phone: "+91 40 6610 5678", servicesThisMonth: 25 },
-      { id: 102, name: "Secundrabad", location: "MG Road", phone: "+91 40 6610 8901", servicesThisMonth: 18 },
-      { id: 103, name: "Kukatpally", location: "KPHB Colony", phone: "+91 40 6610 2345", servicesThisMonth: 22 }
+      { 
+        id: 101, 
+        name: "Hyderabad Central", 
+        location: "Punjagutta Road", 
+        phone: "+91 40 6610 5678", 
+        servicesThisMonth: 25,
+        address: "Ground Floor, Sharma Complex, Punjagutta Road, Hyderabad"
+      },
+      { 
+        id: 102, 
+        name: "Secundrabad", 
+        location: "MG Road", 
+        phone: "+91 40 6610 8901", 
+        servicesThisMonth: 18,
+        address: "First Floor, Business Center, MG Road, Secunderabad"
+      },
+      { 
+        id: 103, 
+        name: "Kukatpally", 
+        location: "KPHB Colony", 
+        phone: "+91 40 6610 2345", 
+        servicesThisMonth: 22,
+        address: "Shop No. 12, KPHB Commercial Complex, Kukatpally, Hyderabad"
+      }
     ]
   },
   { 
     id: 2, 
     name: "Max", 
     type: "Franchise",
-    logo: "/placeholder.svg",
+    logo: "https://raw.githubusercontent.com/dhanushkunapareddy/slv-climate-max-stores/main/assets/img/logo.png",
     phone: "+91 40 6620 1234",
     branches: [
-      { id: 201, name: "Hitech City", location: "Madhapur", phone: "+91 40 6620 5678", servicesThisMonth: 30 },
-      { id: 202, name: "Banjara Hills", location: "Road No. 12", phone: "+91 40 6620 8901", servicesThisMonth: 24 },
-      { id: 203, name: "ECIL", location: "Kushaiguda", phone: "+91 40 6620 2345", servicesThisMonth: 15 }
+      { 
+        id: 201, 
+        name: "Hitech City", 
+        location: "Madhapur", 
+        phone: "+91 40 6620 5678", 
+        servicesThisMonth: 30,
+        address: "Ground Floor, Cyber Towers, Madhapur, Hyderabad"
+      },
+      { 
+        id: 202, 
+        name: "Banjara Hills", 
+        location: "Road No. 12", 
+        phone: "+91 40 6620 8901", 
+        servicesThisMonth: 24,
+        address: "First Floor, Business Plaza, Road No. 12, Banjara Hills"
+      },
+      { 
+        id: 203, 
+        name: "ECIL", 
+        location: "Kushaiguda", 
+        phone: "+91 40 6620 2345", 
+        servicesThisMonth: 15,
+        address: "Shop Complex, ECIL Main Road, Kushaiguda, Hyderabad"
+      }
     ]
   },
   { 
     id: 3, 
     name: "Easybuy", 
     type: "Franchise",
-    logo: "/placeholder.svg",
+    logo: "https://raw.githubusercontent.com/dhanushkunapareddy/slv-climate-easybuy-stores/main/assets/img/logo.png",
     phone: "+91 40 6630 1234",
     branches: [
-      { id: 301, name: "Ameerpet", location: "SR Nagar", phone: "+91 40 6630 5678", servicesThisMonth: 20 },
-      { id: 302, name: "Dilsukhnagar", location: "Moosaram Bagh", phone: "+91 40 6630 8901", servicesThisMonth: 16 },
-      { id: 303, name: "Gachibowli", location: "Financial District", phone: "+91 40 6630 2345", servicesThisMonth: 19 }
+      { 
+        id: 301, 
+        name: "Ameerpet", 
+        location: "SR Nagar", 
+        phone: "+91 40 6630 5678", 
+        servicesThisMonth: 20,
+        address: "Ground Floor, Srinivas Complex, SR Nagar, Hyderabad"
+      },
+      { 
+        id: 302, 
+        name: "Dilsukhnagar", 
+        location: "Moosaram Bagh", 
+        phone: "+91 40 6630 8901", 
+        servicesThisMonth: 16,
+        address: "First Floor, Business Center, Moosaram Bagh, Dilsukhnagar"
+      },
+      { 
+        id: 303, 
+        name: "Gachibowli", 
+        location: "Financial District", 
+        phone: "+91 40 6630 2345", 
+        servicesThisMonth: 19,
+        address: "Shop No. 15, Financial District Complex, Gachibowli"
+      }
     ]
   }
 ];
@@ -424,14 +487,21 @@ const AdminStores = () => {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <img src={store.logo} alt={store.name} className="w-8 h-8 rounded" />
+                  <img 
+                    src={store.logo} 
+                    alt={`${store.name} logo`} 
+                    className="w-12 h-12 rounded-full object-contain"
+                  />
                   <span>{store.name}</span>
                 </div>
                 <Badge variant="outline">{store.type}</Badge>
               </CardTitle>
               <CardDescription className="space-y-1">
                 <div>{store.branches.length} locations</div>
-                <div className="text-sm">{store.phone}</div>
+                <div className="text-sm flex items-center gap-2">
+                  <Phone size={16} className="text-muted-foreground" />
+                  {store.phone}
+                </div>
               </CardDescription>
             </CardHeader>
             <CardContent>
