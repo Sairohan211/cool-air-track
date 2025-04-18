@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, Store, MapPin, MoreHorizontal, Plus } from 'lucide-react';
+import { Search, Store, MapPin, MoreHorizontal, Plus, UserPlus } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -14,31 +14,37 @@ const stores = [
   { 
     id: 1, 
     name: "Lifestyle", 
-    type: "Franchise", 
+    type: "Franchise",
+    logo: "/placeholder.svg",
+    phone: "+91 40 6610 1234",
     branches: [
-      { id: 101, name: "Hyderabad Central", location: "Punjagutta Road", servicesThisMonth: 25 },
-      { id: 102, name: "Secundrabad", location: "MG Road", servicesThisMonth: 18 },
-      { id: 103, name: "Kukatpally", location: "KPHB Colony", servicesThisMonth: 22 }
+      { id: 101, name: "Hyderabad Central", location: "Punjagutta Road", phone: "+91 40 6610 5678", servicesThisMonth: 25 },
+      { id: 102, name: "Secundrabad", location: "MG Road", phone: "+91 40 6610 8901", servicesThisMonth: 18 },
+      { id: 103, name: "Kukatpally", location: "KPHB Colony", phone: "+91 40 6610 2345", servicesThisMonth: 22 }
     ]
   },
   { 
     id: 2, 
     name: "Max", 
-    type: "Franchise", 
+    type: "Franchise",
+    logo: "/placeholder.svg",
+    phone: "+91 40 6620 1234",
     branches: [
-      { id: 201, name: "Hitech City", location: "Madhapur", servicesThisMonth: 30 },
-      { id: 202, name: "Banjara Hills", location: "Road No. 12", servicesThisMonth: 24 },
-      { id: 203, name: "ECIL", location: "Kushaiguda", servicesThisMonth: 15 }
+      { id: 201, name: "Hitech City", location: "Madhapur", phone: "+91 40 6620 5678", servicesThisMonth: 30 },
+      { id: 202, name: "Banjara Hills", location: "Road No. 12", phone: "+91 40 6620 8901", servicesThisMonth: 24 },
+      { id: 203, name: "ECIL", location: "Kushaiguda", phone: "+91 40 6620 2345", servicesThisMonth: 15 }
     ]
   },
   { 
     id: 3, 
-    name: "Easy", 
-    type: "Franchise", 
+    name: "Easybuy", 
+    type: "Franchise",
+    logo: "/placeholder.svg",
+    phone: "+91 40 6630 1234",
     branches: [
-      { id: 301, name: "Ameerpet", location: "SR Nagar", servicesThisMonth: 20 },
-      { id: 302, name: "Dilsukhnagar", location: "Moosaram Bagh", servicesThisMonth: 16 },
-      { id: 303, name: "Gachibowli", location: "Financial District", servicesThisMonth: 19 }
+      { id: 301, name: "Ameerpet", location: "SR Nagar", phone: "+91 40 6630 5678", servicesThisMonth: 20 },
+      { id: 302, name: "Dilsukhnagar", location: "Moosaram Bagh", phone: "+91 40 6630 8901", servicesThisMonth: 16 },
+      { id: 303, name: "Gachibowli", location: "Financial District", phone: "+91 40 6630 2345", servicesThisMonth: 19 }
     ]
   }
 ];
@@ -48,7 +54,14 @@ const AdminStores = () => {
   const [storeFilter, setStoreFilter] = useState<string>("all");
   const [selectedStore, setSelectedStore] = useState<any>(null);
   const [selectedBranch, setSelectedBranch] = useState<any>(null);
-  
+  const [newTechnicianData, setNewTechnicianData] = useState({
+    username: "",
+    password: "",
+    name: "",
+    storeId: "",
+    branchId: ""
+  });
+
   const allBranches = stores.flatMap(store => 
     store.branches.map(branch => ({
       ...branch,
@@ -68,13 +81,121 @@ const AdminStores = () => {
     return matchesSearch && matchesStore;
   });
   
+  const handleTechnicianCreate = () => {
+    console.log("Creating technician:", newTechnicianData);
+    setNewTechnicianData({
+      username: "",
+      password: "",
+      name: "",
+      storeId: "",
+      branchId: ""
+    });
+  };
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Stores</h1>
-        <p className="text-muted-foreground">
-          Manage store locations
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Stores</h1>
+          <p className="text-muted-foreground">
+            Manage store locations and technicians
+          </p>
+        </div>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add Technician
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add New Technician</DialogTitle>
+              <DialogDescription>
+                Create credentials for a new technician
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="techName" className="text-right">Name</Label>
+                <Input
+                  id="techName"
+                  value={newTechnicianData.name}
+                  onChange={(e) => setNewTechnicianData({...newTechnicianData, name: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+              
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="username" className="text-right">Username</Label>
+                <Input
+                  id="username"
+                  value={newTechnicianData.username}
+                  onChange={(e) => setNewTechnicianData({...newTechnicianData, username: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="password" className="text-right">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={newTechnicianData.password}
+                  onChange={(e) => setNewTechnicianData({...newTechnicianData, password: e.target.value})}
+                  className="col-span-3"
+                />
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="store" className="text-right">Store</Label>
+                <Select 
+                  value={newTechnicianData.storeId} 
+                  onValueChange={(value) => setNewTechnicianData({...newTechnicianData, storeId: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select store" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map((store) => (
+                      <SelectItem key={store.id} value={store.id.toString()}>
+                        {store.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="branch" className="text-right">Branch</Label>
+                <Select
+                  value={newTechnicianData.branchId}
+                  onValueChange={(value) => setNewTechnicianData({...newTechnicianData, branchId: value})}
+                >
+                  <SelectTrigger className="col-span-3">
+                    <SelectValue placeholder="Select branch" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {newTechnicianData.storeId && 
+                      stores
+                        .find(s => s.id.toString() === newTechnicianData.storeId)
+                        ?.branches.map((branch) => (
+                          <SelectItem key={branch.id} value={branch.id.toString()}>
+                            {branch.name}
+                          </SelectItem>
+                        ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button onClick={handleTechnicianCreate}>Create Technician</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
 
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -302,11 +423,15 @@ const AdminStores = () => {
           <Card key={store.id}>
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center justify-between">
-                <span>{store.name}</span>
+                <div className="flex items-center gap-2">
+                  <img src={store.logo} alt={store.name} className="w-8 h-8 rounded" />
+                  <span>{store.name}</span>
+                </div>
                 <Badge variant="outline">{store.type}</Badge>
               </CardTitle>
-              <CardDescription>
-                {store.branches.length} locations
+              <CardDescription className="space-y-1">
+                <div>{store.branches.length} locations</div>
+                <div className="text-sm">{store.phone}</div>
               </CardDescription>
             </CardHeader>
             <CardContent>
