@@ -1,5 +1,6 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -39,11 +40,9 @@ interface Customer {
 }
 
 const AdminAMCCustomers = () => {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [showQuarters, setShowQuarters] = useState(false);
-  const [selectedQuarter, setSelectedQuarter] = useState<number | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [password, setPassword] = useState("");
@@ -53,54 +52,8 @@ const AdminAMCCustomers = () => {
 
   const handleCustomerClick = (customer: Customer) => {
     setSelectedCustomer(customer);
-    setShowQuarters(true);
-    setSelectedQuarter(null);
-  };
-
-  const handleQuarterClick = (index: number) => {
-    setSelectedQuarter(index);
-  };
-
-  const handleMarkAsCompleted = () => {
-    if (selectedCustomer && selectedQuarter !== null) {
-      const updatedCustomers = customers.map(customer => {
-        if (customer.id === selectedCustomer.id) {
-          const updatedQuarters = [...customer.quarters];
-          updatedQuarters[selectedQuarter] = true;
-          return { ...customer, quarters: updatedQuarters };
-        }
-        return customer;
-      });
-      
-      setCustomers(updatedCustomers);
-      setSelectedCustomer(prevCustomer => {
-        if (prevCustomer) {
-          const updatedQuarters = [...prevCustomer.quarters];
-          updatedQuarters[selectedQuarter] = true;
-          return { ...prevCustomer, quarters: updatedQuarters };
-        }
-        return null;
-      });
-      
-      toast({
-        title: "Quarter marked as completed",
-        description: `Quarter ${selectedQuarter + 1} has been marked as completed for ${selectedCustomer.name}`,
-      });
-    }
-  };
-
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setIsUploading(true);
-      // Simulate upload
-      setTimeout(() => {
-        setIsUploading(false);
-        toast({
-          title: "File uploaded successfully",
-          description: "The service job sheet has been uploaded",
-        });
-      }, 1500);
-    }
+    // Instead of showing quarters directly, navigate to a service selection page
+    navigate(`/admin/amc-customers/${customer.id}`);
   };
 
   const handleEditCustomer = () => {
@@ -172,149 +125,57 @@ const AdminAMCCustomers = () => {
 
   // Renders the main customer list
   const renderCustomerList = () => (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      {customers.map((customer) => (
-        <Card key={customer.id} className="overflow-hidden">
-          <CardHeader className="relative p-4 pb-0">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="absolute right-2 top-2">
-                  <MoreVertical className="h-5 w-5" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={() => startEdit(customer)}>
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <CardTitle className="text-xl">{customer.name}</CardTitle>
-          </CardHeader>
-          <CardContent className="p-4 pt-2">
-            <div className="mb-4 flex justify-center">
-              <img 
-                src={customer.logo} 
-                alt={`${customer.name} logo`} 
-                className="h-24 w-auto object-contain" 
-              />
-            </div>
-            <Button 
-              variant="outline" 
-              className="w-full"
-              onClick={() => handleCustomerClick(customer)}
-            >
-              View Quarters
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-      
-      <Card className="flex h-full flex-col items-center justify-center p-6">
+    <div className="space-y-6">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold tracking-tight">AMC Customers</h1>
         <Button 
-          variant="outline" 
-          className="h-24 w-full border-dashed"
           onClick={() => setAddingNew(true)}
+          className="flex items-center gap-2"
         >
-          <PlusCircle className="mr-2 h-5 w-5" />
+          <PlusCircle className="h-5 w-5" />
           Add New Customer
         </Button>
-      </Card>
-    </div>
-  );
-
-  // Renders the quarters for a selected customer
-  const renderQuarters = () => (
-    <>
-      <Button 
-        variant="outline" 
-        className="mb-4"
-        onClick={() => setShowQuarters(false)}
-      >
-        ← Back to Customers
-      </Button>
+      </div>
       
-      <Card>
-        <CardHeader>
-          <CardTitle>{selectedCustomer?.name} - Quarterly Reports</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            {selectedCustomer?.quarters.map((isCompleted, index) => (
-              <Card 
-                key={index} 
-                className={`cursor-pointer ${isCompleted ? 'border-green-500' : ''}`}
-                onClick={() => handleQuarterClick(index)}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {customers.map((customer) => (
+          <Card key={customer.id} className="overflow-hidden">
+            <CardHeader className="relative p-4 pb-0">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="absolute right-2 top-2">
+                    <MoreVertical className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={() => startEdit(customer)}>
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <CardTitle className="text-xl">{customer.name}</CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 pt-2">
+              <div className="mb-4 flex justify-center">
+                <img 
+                  src={customer.logo} 
+                  alt={`${customer.name} logo`} 
+                  className="h-24 w-auto object-contain" 
+                />
+              </div>
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => handleCustomerClick(customer)}
               >
-                <CardHeader className="p-4 pb-2">
-                  <CardTitle className="text-lg">Quarter {index + 1}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-4 pt-0">
-                  <div className={`text-sm font-medium ${isCompleted ? 'text-green-500' : 'text-blue-500'}`}>
-                    {isCompleted ? 'Completed' : 'Pending'}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </>
-  );
-
-  // Renders the selected quarter details
-  const renderQuarterDetails = () => (
-    <>
-      <Button 
-        variant="outline" 
-        className="mb-4"
-        onClick={() => setSelectedQuarter(null)}
-      >
-        ← Back to Quarters
-      </Button>
-      
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div>
-            <CardTitle>{selectedCustomer?.name} - Quarter {selectedQuarter !== null ? selectedQuarter + 1 : ''}</CardTitle>
-            <p className="text-sm text-muted-foreground">Upload service job sheet image/PDF</p>
-          </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon">
-                <MoreVertical className="h-5 w-5" />
+                View Services
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem onClick={handleMarkAsCompleted}>
-                <Check className="mr-2 h-4 w-4" />
-                Mark as Completed
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-12">
-            <Upload className="mb-4 h-10 w-10 text-muted-foreground" />
-            <p className="mb-2 text-sm font-medium">Click to upload or drag and drop</p>
-            <p className="text-xs text-muted-foreground">PDF or image (max. 10MB)</p>
-            <Button 
-              variant="secondary" 
-              className="mt-4" 
-              disabled={isUploading}
-            >
-              {isUploading ? "Uploading..." : "Upload File"}
-              <input
-                type="file"
-                className="absolute inset-0 cursor-pointer opacity-0"
-                accept=".pdf,image/*"
-                onChange={handleFileUpload}
-              />
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
   );
 
   // Edit Customer Dialog
@@ -428,15 +289,7 @@ const AdminAMCCustomers = () => {
 
   return (
     <div className="container mx-auto p-4 md:p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">AMC Customers</h1>
-        <p className="text-muted-foreground">Manage your AMC customers and quarterly reports.</p>
-      </div>
-
-      {!showQuarters && !selectedQuarter && renderCustomerList()}
-      {showQuarters && selectedCustomer && selectedQuarter === null && renderQuarters()}
-      {showQuarters && selectedCustomer && selectedQuarter !== null && renderQuarterDetails()}
-      
+      {renderCustomerList()}
       {renderEditCustomerDialog()}
       {renderAddCustomerDialog()}
     </div>

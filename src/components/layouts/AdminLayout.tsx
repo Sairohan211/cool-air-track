@@ -17,6 +17,13 @@ const AdminLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Close sidebar when navigating to a new page on mobile
+  const handleNavigation = () => {
+    if (window.innerWidth < 768) {
+      setSidebarOpen(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Header */}
@@ -65,30 +72,35 @@ const AdminLayout = () => {
                 icon={<Home size={20} />} 
                 label="Dashboard" 
                 active={location.pathname === '/admin'} 
+                onClick={handleNavigation}
               />
               <NavItem 
                 to="/admin/technicians" 
                 icon={<Users size={20} />} 
                 label="Technicians" 
                 active={location.pathname === '/admin/technicians'} 
+                onClick={handleNavigation}
               />
               <NavItem 
                 to="/admin/stores" 
                 icon={<Store size={20} />} 
                 label="Stores" 
                 active={location.pathname === '/admin/stores'} 
+                onClick={handleNavigation}
               />
               <NavItem 
                 to="/admin/amc-customers" 
                 icon={<CreditCard size={20} />} 
                 label="AMC Customers" 
                 active={location.pathname === '/admin/amc-customers'} 
+                onClick={handleNavigation}
               />
               <NavItem 
                 to="/admin/reports" 
                 icon={<BarChart size={20} />} 
                 label="Reports" 
                 active={location.pathname === '/admin/reports'} 
+                onClick={handleNavigation}
               />
             </div>
 
@@ -118,9 +130,10 @@ interface NavItemProps {
   icon: React.ReactNode;
   label: string;
   active: boolean;
+  onClick?: () => void;
 }
 
-const NavItem = ({ to, icon, label, active }: NavItemProps) => {
+const NavItem = ({ to, icon, label, active, onClick }: NavItemProps) => {
   return (
     <Link
       to={to}
@@ -129,6 +142,7 @@ const NavItem = ({ to, icon, label, active }: NavItemProps) => {
           ? 'bg-primary text-white' 
           : 'text-gray-600 hover:bg-gray-100'
       }`}
+      onClick={onClick}
     >
       {icon}
       <span>{label}</span>

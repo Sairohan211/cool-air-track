@@ -1,283 +1,377 @@
 
-import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { UserPlus, Search, MoreHorizontal } from 'lucide-react';
-import { useToast } from "@/components/ui/use-toast";
-import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { toast } from "@/components/ui/use-toast";
+import { UserPlus, User, Edit, Trash, MoreVertical } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-// Mock data for admin accounts
-const adminAccounts = [
-  {
-    id: 1,
-    username: "admin",
-    name: "System Administrator",
-    email: "admin@acservices.com",
-    role: "super_admin",
-    lastLogin: "2023-04-15T10:30:00"
-  },
-  {
-    id: 2,
-    username: "manager",
-    name: "Regional Manager",
-    email: "manager@acservices.com",
-    role: "admin",
-    lastLogin: "2023-04-14T16:45:00"
-  }
+// Sample data for employees
+const initialEmployees = [
+  { id: 1, name: "John Doe", email: "john@example.com", role: "admin", password: "password123" },
+  { id: 2, name: "Jane Smith", email: "jane@example.com", role: "technician", password: "password123" },
+  { id: 3, name: "Mike Johnson", email: "mike@example.com", role: "technician", password: "password123" },
 ];
 
+interface Employee {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  password: string;
+}
+
 const AdminAccounts = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const { toast } = useToast();
+  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [isAddingEmployee, setIsAddingEmployee] = useState(false);
+  const [isEditingEmployee, setIsEditingEmployee] = useState(false);
+  const [currentEmployee, setCurrentEmployee] = useState<Employee | null>(null);
   
-  // Setup form for adding new admin
-  const form = useForm({
-    defaultValues: {
-      name: "",
-      email: "",
-      username: "",
-      password: "",
-      role: "admin"
-    }
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    role: "technician",
+    password: "",
+    confirmPassword: ""
+  });
+  
+  const [formErrors, setFormErrors] = useState({
+    name: false,
+    email: false,
+    password: false,
+    confirmPassword: false
   });
 
-  // Filter admins based on search
-  const filteredAdmins = adminAccounts.filter(admin => 
-    admin.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    admin.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  // Handle form submission for new admin
-  const onSubmit = (data: any) => {
-    // In a real app, this would send data to the backend
-    console.log("New admin data:", data);
-    
-    // Show success message
-    toast({
-      title: "Success!",
-      description: `Admin ${data.name} (${data.username}) has been added.`,
+  const resetForm = () => {
+    setFormData({
+      name: "",
+      email: "",
+      role: "technician",
+      password: "",
+      confirmPassword: ""
     });
     
-    // Reset form and close dialog
-    form.reset();
-    setIsDialogOpen(false);
+    setFormErrors({
+      name: false,
+      email: false,
+      password: false,
+      confirmPassword: false
+    });
   };
 
-  const generateRandomPassword = () => {
-    // Generate a secure password
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*";
-    let password = "";
-    for (let i = 0; i < 12; i++) {
-      password += chars.charAt(Math.floor(Math.random() * chars.length));
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear error for this field when user types
+    if (formErrors[field as keyof typeof formErrors]) {
+      setFormErrors(prev => ({ ...prev, [field]: false }));
     }
-    form.setValue("password", password);
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit'
+  const openAddEmployeeDialog = () => {
+    resetForm();
+    setIsAddingEmployee(true);
+  };
+
+  const openEditEmployeeDialog = (employee: Employee) => {
+    setCurrentEmployee(employee);
+    setFormData({
+      name: employee.name,
+      email: employee.email,
+      role: employee.role,
+      password: "",
+      confirmPassword: ""
+    });
+    setIsEditingEmployee(true);
+  };
+
+  const validateForm = () => {
+    const errors = {
+      name: !formData.name.trim(),
+      email: !/^\S+@\S+\.\S+$/.test(formData.email),
+      password: isAddingEmployee && formData.password.length < 6,
+      confirmPassword: isAddingEmployee && formData.password !== formData.confirmPassword
+    };
+    
+    setFormErrors(errors);
+    
+    return !Object.values(errors).some(error => error);
+  };
+
+  const handleAddEmployee = () => {
+    if (!validateForm()) return;
+    
+    const newEmployee: Employee = {
+      id: employees.length + 1,
+      name: formData.name,
+      email: formData.email,
+      role: formData.role,
+      password: formData.password
+    };
+    
+    setEmployees([...employees, newEmployee]);
+    setIsAddingEmployee(false);
+    resetForm();
+    
+    toast({
+      title: "Employee Added",
+      description: `${newEmployee.name} has been added as a ${newEmployee.role}`,
+    });
+  };
+
+  const handleEditEmployee = () => {
+    if (!currentEmployee) return;
+    
+    // Simplified validation for edit (no password required)
+    if (!formData.name.trim() || !/^\S+@\S+\.\S+$/.test(formData.email)) {
+      setFormErrors({
+        ...formErrors,
+        name: !formData.name.trim(),
+        email: !/^\S+@\S+\.\S+$/.test(formData.email)
+      });
+      return;
+    }
+    
+    const updatedEmployees = employees.map(emp => {
+      if (emp.id === currentEmployee.id) {
+        return {
+          ...emp,
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          ...(formData.password && { password: formData.password })
+        };
+      }
+      return emp;
+    });
+    
+    setEmployees(updatedEmployees);
+    setIsEditingEmployee(false);
+    setCurrentEmployee(null);
+    resetForm();
+    
+    toast({
+      title: "Employee Updated",
+      description: `${formData.name}'s information has been updated`,
+    });
+  };
+
+  const handleDeleteEmployee = (employee: Employee) => {
+    const updatedEmployees = employees.filter(emp => emp.id !== employee.id);
+    setEmployees(updatedEmployees);
+    
+    toast({
+      title: "Employee Removed",
+      description: `${employee.name} has been removed from the system`,
     });
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Admin Accounts</h1>
-        <p className="text-muted-foreground">
-          Manage administrator accounts and permissions
-        </p>
-      </div>
-
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-        <div className="relative flex-1 max-w-sm">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search admins..."
-            className="pl-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+    <div className="container mx-auto p-4 md:p-6">
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Employee Accounts</h1>
+          <p className="text-muted-foreground">Manage admin and technician accounts</p>
         </div>
-        
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <UserPlus className="mr-2 h-4 w-4" />
-              Add Admin
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Administrator</DialogTitle>
-              <DialogDescription>
-                Create a new admin account with appropriate permissions.
-              </DialogDescription>
-            </DialogHeader>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Full Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Email Address" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Login Username" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <FormControl>
-                          <select
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                            {...field}
-                          >
-                            <option value="admin">Admin</option>
-                            <option value="super_admin">Super Admin</option>
-                          </select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Password</FormLabel>
-                      <div className="flex gap-2">
-                        <FormControl>
-                          <Input
-                            type="text"
-                            placeholder="Secure Password"
-                            {...field}
-                          />
-                        </FormControl>
-                        <Button 
-                          type="button" 
-                          variant="outline" 
-                          onClick={generateRandomPassword}
-                          size="sm"
-                        >
-                          Generate
-                        </Button>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button type="submit">Add Administrator</Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={openAddEmployeeDialog} className="flex items-center gap-2">
+          <UserPlus size={16} />
+          Add Employee
+        </Button>
       </div>
-
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Username</TableHead>
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Role</TableHead>
-                <TableHead>Last Login</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredAdmins.map(admin => (
-                <TableRow key={admin.id}>
-                  <TableCell className="font-medium">{admin.username}</TableCell>
-                  <TableCell>{admin.name}</TableCell>
-                  <TableCell>{admin.email}</TableCell>
-                  <TableCell>
-                    <Badge variant={admin.role === "super_admin" ? "default" : "secondary"}>
-                      {admin.role === "super_admin" ? "Super Admin" : "Admin"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{formatDate(admin.lastLogin)}</TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Open menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                        <DropdownMenuItem>Reset Password</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {employees.map(employee => (
+          <Card key={employee.id}>
+            <CardHeader className="relative pb-2">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="absolute right-2 top-2">
+                    <MoreVertical size={16} />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => openEditEmployeeDialog(employee)}>
+                    <Edit size={14} className="mr-2" />
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleDeleteEmployee(employee)} className="text-red-600">
+                    <Trash size={14} className="mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <div className="flex items-center">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                  <User size={20} className="text-primary" />
+                </div>
+                <CardTitle>{employee.name}</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Email:</span>
+                  <span>{employee.email}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Role:</span>
+                  <span className="capitalize">{employee.role}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+      
+      {/* Add Employee Dialog */}
+      <Dialog open={isAddingEmployee} onOpenChange={setIsAddingEmployee}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add New Employee</DialogTitle>
+            <DialogDescription>
+              Create a new employee account. They'll be able to log in using these credentials.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input 
+                id="name" 
+                value={formData.name} 
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                className={formErrors.name ? "border-red-500" : ""}
+              />
+              {formErrors.name && <p className="text-sm text-red-500">Name is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <Input 
+                id="email" 
+                type="email" 
+                value={formData.email} 
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className={formErrors.email ? "border-red-500" : ""}
+              />
+              {formErrors.email && <p className="text-sm text-red-500">Valid email is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Select 
+                value={formData.role} 
+                onValueChange={(value) => handleInputChange("role", value)}
+              >
+                <SelectTrigger id="role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="technician">Technician</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                value={formData.password} 
+                onChange={(e) => handleInputChange("password", e.target.value)}
+                className={formErrors.password ? "border-red-500" : ""}
+              />
+              {formErrors.password && <p className="text-sm text-red-500">Password must be at least 6 characters</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input 
+                id="confirmPassword" 
+                type="password" 
+                value={formData.confirmPassword} 
+                onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                className={formErrors.confirmPassword ? "border-red-500" : ""}
+              />
+              {formErrors.confirmPassword && <p className="text-sm text-red-500">Passwords do not match</p>}
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddingEmployee(false)}>Cancel</Button>
+            <Button onClick={handleAddEmployee}>Create Account</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Edit Employee Dialog */}
+      <Dialog open={isEditingEmployee} onOpenChange={setIsEditingEmployee}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Employee</DialogTitle>
+            <DialogDescription>
+              Update employee information.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Full Name</Label>
+              <Input 
+                id="edit-name" 
+                value={formData.name} 
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                className={formErrors.name ? "border-red-500" : ""}
+              />
+              {formErrors.name && <p className="text-sm text-red-500">Name is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email Address</Label>
+              <Input 
+                id="edit-email" 
+                type="email" 
+                value={formData.email} 
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className={formErrors.email ? "border-red-500" : ""}
+              />
+              {formErrors.email && <p className="text-sm text-red-500">Valid email is required</p>}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role</Label>
+              <Select 
+                value={formData.role} 
+                onValueChange={(value) => handleInputChange("role", value)}
+              >
+                <SelectTrigger id="edit-role">
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="technician">Technician</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="edit-password">New Password (optional)</Label>
+              <Input 
+                id="edit-password" 
+                type="password" 
+                value={formData.password} 
+                onChange={(e) => handleInputChange("password", e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Leave blank to keep the current password</p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditingEmployee(false)}>Cancel</Button>
+            <Button onClick={handleEditEmployee}>Save Changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

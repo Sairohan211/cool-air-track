@@ -24,6 +24,7 @@ import AdminAccounts from "./pages/admin/AdminAccounts";
 import AdminStores from "./pages/admin/Stores";
 import AdminReports from "./pages/admin/Reports";
 import AdminAMCCustomers from "./pages/admin/AMCCustomers";
+import CustomerServices from "./pages/admin/CustomerServices";
 
 // Layout Components
 import AuthLayout from "./components/layouts/AuthLayout";
@@ -58,6 +59,7 @@ const App = () => (
             <Route path="accounts" element={<AdminAccounts />} />
             <Route path="stores" element={<AdminStores />} />
             <Route path="amc-customers" element={<AdminAMCCustomers />} />
+            <Route path="amc-customers/:customerId" element={<CustomerServices />} />
             <Route path="reports" element={<AdminReports />} />
           </Route>
           
