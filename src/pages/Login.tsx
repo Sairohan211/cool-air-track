@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -30,12 +29,31 @@ const Login = () => {
     setShowFirstTimeSetup(!hasExistingAdmin || hasExistingAdmin === '[]');
   }, []);
 
+  // Check if the user is already logged in
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    const userRole = localStorage.getItem('userRole');
+    
+    if (isLoggedIn === 'true') {
+      if (userRole === 'admin') {
+        navigate('/admin');
+      } else if (userRole === 'technician') {
+        navigate('/technician');
+      }
+    }
+  }, [navigate]);
+
   const handleTechnicianLogin = (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     
     // In a real application, we would authenticate against a backend here
     setTimeout(() => {
+      // Save login state in localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userRole', 'technician');
+      localStorage.setItem('techId', techId);
+      
       navigate('/technician');
       setLoading(false);
     }, 1000);
@@ -47,11 +65,17 @@ const Login = () => {
     
     // Check if admin exists in local storage
     const admins = JSON.parse(localStorage.getItem('adminAccounts') || '[]');
-    const adminExists = admins.some(
+    const admin = admins.find(
       (admin: any) => admin.username === adminUsername && admin.password === adminPassword
     );
 
-    if (adminExists) {
+    if (admin) {
+      // Save login state in localStorage
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userRole', 'admin');
+      localStorage.setItem('adminUsername', adminUsername);
+      localStorage.setItem('adminName', admin.name);
+      
       setTimeout(() => {
         navigate('/admin');
         setLoading(false);
@@ -100,15 +124,24 @@ const Login = () => {
     // Store in localStorage (in a real app, this would be in a secure database)
     localStorage.setItem('adminAccounts', JSON.stringify([firstAdmin]));
     
+    // Also log the user in immediately
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('userRole', 'admin');
+    localStorage.setItem('adminUsername', setupAdminUsername);
+    localStorage.setItem('adminName', setupAdminName);
+    
     // Close the dialog and update state
     setIsFirstTimeDialogOpen(false);
     setShowFirstTimeSetup(false);
     
     toast({
       title: "Admin Account Created",
-      description: "You can now log in with your new admin account.",
+      description: "Logging you in with your new admin account.",
       variant: "default"
     });
+    
+    // Navigate to admin dashboard
+    navigate('/admin');
   };
 
   return (
