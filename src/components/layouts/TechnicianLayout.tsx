@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, UserCheck, FileText, History, LogOut } from 'lucide-react';
 
@@ -15,7 +14,7 @@ const TechnicianLayout = () => {
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
       {/* Mobile Header */}
       <div className="md:hidden p-4 bg-primary text-white flex justify-between items-center">
-        <h1 className="text-xl font-bold">AC Services</h1>
+        <h1 className="text-xl font-bold">SLV CLIMATE SOLUTIONS (employee)</h1>
         <button 
           onClick={handleLogout}
           className="p-2 rounded-full hover:bg-primary-foreground/10"
@@ -28,7 +27,7 @@ const TechnicianLayout = () => {
       <nav className="hidden md:block w-64 bg-white shadow-md p-6">
         <div className="flex flex-col h-full">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-primary">AC Services</h1>
+            <h1 className="text-2xl font-bold text-primary">SLV CLIMATE SOLUTIONS</h1>
             <p className="text-sm text-gray-500">Technician Portal</p>
           </div>
 

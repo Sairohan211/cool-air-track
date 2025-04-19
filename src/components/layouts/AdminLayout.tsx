@@ -1,4 +1,3 @@
-
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Users, Store, BarChart, LogOut, Menu, X, Briefcase, CreditCard } from 'lucide-react';
 import { useState } from 'react';
@@ -9,7 +8,6 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
-    // In a real app, you would handle logout logic here
     navigate('/login');
   };
 
@@ -17,7 +15,6 @@ const AdminLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Close sidebar when navigating to a new page on mobile
   const handleNavigation = () => {
     if (window.innerWidth < 768) {
       setSidebarOpen(false);
@@ -26,7 +23,6 @@ const AdminLayout = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
       <header className="bg-primary text-white p-4 flex justify-between items-center shadow-md z-20">
         <div className="flex items-center space-x-4">
           <button 
@@ -35,7 +31,7 @@ const AdminLayout = () => {
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
-          <h1 className="text-xl font-bold">AC Services Admin</h1>
+          <h1 className="text-xl font-bold">SLV CLIMATE SOLUTIONS (admin)</h1>
         </div>
         <button 
           onClick={handleLogout}
@@ -46,7 +42,6 @@ const AdminLayout = () => {
       </header>
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar - Mobile (Overlay) */}
         <div 
           className={`fixed inset-0 bg-black/50 z-10 md:hidden transition-opacity ${
             sidebarOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
@@ -54,7 +49,6 @@ const AdminLayout = () => {
           onClick={toggleSidebar}
         />
 
-        {/* Sidebar */}
         <nav 
           className={`fixed md:static w-64 bg-white shadow-lg h-full z-20 transform transition-transform duration-300 ease-in-out ${
             sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
@@ -62,7 +56,7 @@ const AdminLayout = () => {
         >
           <div className="flex flex-col h-full p-6">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-primary">AC Services</h1>
+              <h1 className="text-2xl font-bold text-primary">SLV CLIMATE SOLUTIONS</h1>
               <p className="text-sm text-gray-500">Admin Portal</p>
             </div>
 
@@ -116,7 +110,6 @@ const AdminLayout = () => {
           </div>
         </nav>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
