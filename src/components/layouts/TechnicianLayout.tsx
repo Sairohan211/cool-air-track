@@ -6,7 +6,12 @@ const TechnicianLayout = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    // In a real app, you would handle logout logic here
+    // Clear login data from localStorage
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('techId');
+    
+    // Navigate to login page
     navigate('/login');
   };
 

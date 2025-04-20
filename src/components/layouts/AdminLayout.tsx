@@ -8,6 +8,13 @@ const AdminLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
+    // Clear login data from localStorage
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('adminUsername');
+    localStorage.removeItem('adminName');
+    
+    // Navigate to login page
     navigate('/login');
   };
 
