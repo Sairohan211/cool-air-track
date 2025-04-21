@@ -13,16 +13,15 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PlusCircle, Edit, MoreVertical, Upload, Check } from "lucide-react";
+import { PlusCircle, Edit, MoreVertical, Upload, Trash2 } from "lucide-react";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
-// Sample customer data
 const initialCustomers = [
   { id: 1, name: "ICICI Bank", logo: "/placeholder.svg", password: "12345678", quarters: [false, false, false, false] },
   { id: 2, name: "Federal Bank", logo: "/placeholder.svg", password: "12345678", quarters: [true, false, false, false] },
@@ -43,6 +42,7 @@ const AdminAMCCustomers = () => {
   const [customers, setCustomers] = useState<Customer[]>(initialCustomers);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
   const [editCustomer, setEditCustomer] = useState<Customer | null>(null);
+  const [deleteCustomer, setDeleteCustomer] = useState<Customer | null>(null);
   const [newCustomerName, setNewCustomerName] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState(false);
@@ -82,6 +82,26 @@ const AdminAMCCustomers = () => {
     toast({
       title: "Customer updated",
       description: "Customer details have been updated successfully",
+    });
+  };
+
+  const handleDeleteCustomer = () => {
+    if (!deleteCustomer) return;
+    
+    if (password !== deleteCustomer.password) {
+      setPasswordError(true);
+      return;
+    }
+    
+    const updatedCustomers = customers.filter(customer => customer.id !== deleteCustomer.id);
+    setCustomers(updatedCustomers);
+    setDeleteCustomer(null);
+    setPassword("");
+    setPasswordError(false);
+    
+    toast({
+      title: "Customer deleted",
+      description: "Customer has been deleted successfully",
     });
   };
 
@@ -147,6 +167,13 @@ const AdminAMCCustomers = () => {
                   <DropdownMenuItem onClick={() => startEdit(customer)}>
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => setDeleteCustomer(customer)}
+                    className="text-red-600 focus:text-red-600"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -240,6 +267,42 @@ const AdminAMCCustomers = () => {
     </Dialog>
   );
 
+  const renderDeleteDialog = () => (
+    <Dialog open={!!deleteCustomer} onOpenChange={(open) => !open && setDeleteCustomer(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Customer</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. Please enter the customer password to confirm deletion.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="password">Confirm Password</Label>
+            <Input 
+              id="password" 
+              type="password" 
+              value={password} 
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError(false);
+              }} 
+              placeholder="Enter password to confirm deletion"
+              className={passwordError ? "border-red-500" : ""}
+            />
+            {passwordError && (
+              <p className="text-sm text-red-500">Incorrect password</p>
+            )}
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setDeleteCustomer(null)}>Cancel</Button>
+          <Button variant="destructive" onClick={handleDeleteCustomer}>Delete Customer</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   const renderAddCustomerDialog = () => (
     <Dialog open={addingNew} onOpenChange={setAddingNew}>
       <DialogContent>
@@ -285,6 +348,7 @@ const AdminAMCCustomers = () => {
     <div className="container mx-auto p-4 md:p-6">
       {renderCustomerList()}
       {renderEditCustomerDialog()}
+      {renderDeleteDialog()}
       {renderAddCustomerDialog()}
     </div>
   );
