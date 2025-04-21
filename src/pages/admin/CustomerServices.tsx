@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -101,6 +102,7 @@ const CustomerServices = () => {
   const [showDeleteBranchDialog, setShowDeleteBranchDialog] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState<Branch | null>(null);
 
+  // Load customer data
   useEffect(() => {
     if (customerId) {
       const customerData = customers.find(c => c.id.toString() === customerId);
@@ -118,6 +120,7 @@ const CustomerServices = () => {
     }
   }, [customerId, navigate]);
 
+  // Load breakdown services
   useEffect(() => {
     if (!customer || !selectedBranch) {
       setBreakdownServices([]);
@@ -127,6 +130,7 @@ const CustomerServices = () => {
     setBreakdownServices(allServices.filter((s: Service) => s.branchId === selectedBranch.id));
   }, [customer, selectedBranch]);
 
+  // Add new branch
   const handleAddBranch = () => {
     if (!newBranchName) {
       toast({
@@ -151,18 +155,18 @@ const CustomerServices = () => {
     toast({ title: "Branch added", description: `Branch "${newBranch.name}" added.` });
   };
 
+  // Navigation handlers
   const handleQuarterClick = (index: number) => setSelectedQuarter(index);
   const handleBackToQuarters = () => setSelectedQuarter(null);
-
   const handleBackToBranches = () => {
     setSelectedBranch(null);
     setSelectedQuarter(null);
   };
-
   const handleBackToCustomers = () => {
     navigate("/admin/amc-customers");
   };
 
+  // Upload handlers
   const handleUploadDialogOpen = (tab: string) => {
     setUploadingTab(tab);
     setShowUploadDialog(true);
@@ -209,6 +213,7 @@ const CustomerServices = () => {
     }, 1500);
   };
 
+  // Mark quarter as completed
   const markQuarterAsCompleted = () => {
     if (customer && selectedBranch && selectedQuarter !== null) {
       const updatedBranches = customer.branches.map((b: Branch) =>
@@ -225,6 +230,7 @@ const CustomerServices = () => {
     }
   };
 
+  // Branch edit handlers
   const handleBranchEdit = () => {
     if (!editingBranch) return;
     if (!editBranchName.trim()) {
@@ -246,6 +252,7 @@ const CustomerServices = () => {
     toast({ title: "Branch updated", description: `Branch name updated.` });
   };
 
+  // Branch delete handler
   const handleBranchDelete = () => {
     if (customer && branchToDelete) {
       const updatedBranches = customer.branches.filter((b: Branch) => b.id !== branchToDelete.id);
@@ -256,6 +263,7 @@ const CustomerServices = () => {
     setBranchToDelete(null);
   };
 
+  // Dialog components
   const renderAddBranchDialog = () => (
     <Dialog open={showAddBranchDialog} onOpenChange={setShowAddBranchDialog}>
       <DialogContent>
@@ -326,6 +334,7 @@ const CustomerServices = () => {
     </Dialog>
   );
 
+  // Branch list view
   const renderBranchesView = () => (
     <div className="container mx-auto p-4 md:p-6">
       <Button
@@ -421,6 +430,7 @@ const CustomerServices = () => {
     </div>
   );
 
+  // Branch services view (breakdown & quarterly)
   const renderBranchServicesView = () => {
     if (!selectedBranch) return null;
 
@@ -638,9 +648,10 @@ const CustomerServices = () => {
           </DialogContent>
         </Dialog>
       </div>
-    )
+    );
   };
 
+  // Determine which view to render
   if (!customer) {
     return <div className="p-8 text-center">Loading customer details...</div>;
   }
