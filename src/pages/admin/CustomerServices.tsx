@@ -1,15 +1,13 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "@/components/ui/use-toast";
-import { Upload, FileText, ArrowLeft, Folder, Plus } from "lucide-react";
+import { Upload, FileText, ArrowLeft, Folder, Plus, MoreVertical, Edit, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 
-// Modified customer data structure: Include 'branches'
 const customers = [
   {
     id: 1,
@@ -50,7 +48,6 @@ const customers = [
   }
 ];
 
-// Sample breakdown service data per branch id (for demonstration purpose)
 const breakdownServicesData = {
   1: [
     { id: 1, branchId: 1, date: "2024-04-15", fileName: "ICICI_Koramangala_breakdown_1.pdf", uploadDate: "2024-04-16" },
@@ -83,28 +80,27 @@ const CustomerServices = () => {
   const { customerId } = useParams<{ customerId: string }>();
   const navigate = useNavigate();
 
-  // Top-level: Customer and Branch selection
   const [customer, setCustomer] = useState<any>(null);
   const [selectedBranch, setSelectedBranch] = useState<Branch | null>(null);
-
-  // Services state, branch-by-branch
   const [breakdownServices, setBreakdownServices] = useState<Service[]>([]);
   const [selectedQuarter, setSelectedQuarter] = useState<number | null>(null);
-
-  // Dialog/UI state
   const [showAddBranchDialog, setShowAddBranchDialog] = useState(false);
   const [newBranchName, setNewBranchName] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadingTab, setUploadingTab] = useState<string | null>(null);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
   const [serviceDate, setServiceDate] = useState("");
+  const [editingBranch, setEditingBranch] = useState<Branch | null>(null);
+  const [editBranchName, setEditBranchName] = useState("");
+  const [showDeleteBranchDialog, setShowDeleteBranchDialog] = useState(false);
+  const [branchToDelete, setBranchToDelete] = useState<Branch | null>(null);
 
   useEffect(() => {
     if (customerId) {
       const customerData = customers.find(c => c.id.toString() === customerId);
       if (customerData) {
         setCustomer(customerData);
-        setSelectedBranch(null); // reset on mount/change
+        setSelectedBranch(null);
       } else {
         navigate("/admin/amc-customers");
         toast({
@@ -116,19 +112,14 @@ const CustomerServices = () => {
     }
   }, [customerId, navigate]);
 
-  // Load breakdown services when branch changes
   useEffect(() => {
     if (!customer || !selectedBranch) {
       setBreakdownServices([]);
       return;
     }
-    // Filter demo data for current customer and branch
-    // You'd fetch this from API in real app
     const allServices = breakdownServicesData[customer.id] || [];
     setBreakdownServices(allServices.filter((s: Service) => s.branchId === selectedBranch.id));
   }, [customer, selectedBranch]);
-
-  // -- Handlers for branches --
 
   const handleAddBranch = () => {
     if (!newBranchName) {
@@ -139,7 +130,6 @@ const CustomerServices = () => {
       });
       return;
     }
-    // Demo: append to branches (deep-clone necessary in real app)
     const newBranch: Branch = {
       id: (customer.branches.length > 0 ? Math.max(...customer.branches.map((b: any) => b.id)) + 1 : 1),
       name: newBranchName,
@@ -155,7 +145,6 @@ const CustomerServices = () => {
     toast({ title: "Branch added", description: `Branch "${newBranch.name}" added.` });
   };
 
-  // Handlers for services, scoped to selectedBranch
   const handleQuarterClick = (index: number) => setSelectedQuarter(index);
   const handleBackToQuarters = () => setSelectedQuarter(null);
 
@@ -171,7 +160,7 @@ const CustomerServices = () => {
   const handleUploadDialogOpen = (tab: string) => {
     setUploadingTab(tab);
     setShowUploadDialog(true);
-    setServiceDate(new Date().toISOString().split('T')[0]); // Set to current date
+    setServiceDate(new Date().toISOString().split('T')[0]);
   };
 
   const handleFileUpload = () => {
@@ -181,7 +170,6 @@ const CustomerServices = () => {
       setShowUploadDialog(false);
 
       if (uploadingTab === "breakdown") {
-        // Add a new breakdown service to the list (local state only)
         if (!selectedBranch || !customer) return;
         const newService = {
           id: breakdownServices.length + 1,
@@ -197,7 +185,6 @@ const CustomerServices = () => {
           description: "The service job sheet has been uploaded successfully"
         });
       } else if (uploadingTab === "quarterly" && selectedQuarter !== null && selectedBranch && customer) {
-        // Mark quarterly service as completed for the selected branch
         const updatedBranches = customer.branches.map((b: Branch) =>
           b.id === selectedBranch.id
             ? { ...b, quarters: b.quarters.map((q, idx) => idx === selectedQuarter ? true : q) }
@@ -232,7 +219,37 @@ const CustomerServices = () => {
     }
   };
 
-  // --- UI for Adding a Branch ---
+  const handleBranchEdit = () => {
+    if (!editingBranch) return;
+    if (!editBranchName.trim()) {
+      toast({
+        title: "Branch name required",
+        description: "Please provide a branch name.",
+        variant: "destructive"
+      });
+      return;
+    }
+    if (customer) {
+      const updatedBranches = customer.branches.map((b: Branch) =>
+        b.id === editingBranch.id ? { ...b, name: editBranchName } : b
+      );
+      setCustomer({ ...customer, branches: updatedBranches });
+    }
+    setEditingBranch(null);
+    setEditBranchName("");
+    toast({ title: "Branch updated", description: `Branch name updated.` });
+  };
+
+  const handleBranchDelete = () => {
+    if (customer && branchToDelete) {
+      const updatedBranches = customer.branches.filter((b: Branch) => b.id !== branchToDelete.id);
+      setCustomer({ ...customer, branches: updatedBranches });
+      toast({ title: "Branch deleted", description: `Branch "${branchToDelete.name}" deleted.` });
+    }
+    setShowDeleteBranchDialog(false);
+    setBranchToDelete(null);
+  };
+
   const renderAddBranchDialog = () => (
     <Dialog open={showAddBranchDialog} onOpenChange={setShowAddBranchDialog}>
       <DialogContent>
@@ -259,7 +276,50 @@ const CustomerServices = () => {
     </Dialog>
   );
 
-  // --- Renders branch selection view ---
+  const renderEditBranchDialog = () => (
+    <Dialog open={!!editingBranch} onOpenChange={(open) => !open && setEditingBranch(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Branch</DialogTitle>
+          <DialogDescription>Update the branch name.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <Label htmlFor="editBranchName">Branch Name</Label>
+            <Input
+              id="editBranchName"
+              value={editBranchName}
+              onChange={e => setEditBranchName(e.target.value)}
+              placeholder="Enter branch name"
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setEditingBranch(null)}>Cancel</Button>
+          <Button onClick={handleBranchEdit}>Save Changes</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  const renderDeleteBranchDialog = () => (
+    <Dialog open={showDeleteBranchDialog} onOpenChange={setShowDeleteBranchDialog}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Branch?</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete{" "}
+            <span className="font-semibold">{branchToDelete?.name}</span>? This cannot be undone.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowDeleteBranchDialog(false)}>Cancel</Button>
+          <Button variant="destructive" onClick={handleBranchDelete}>Delete</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
   const renderBranchesView = () => (
     <div className="container mx-auto p-4 md:p-6">
       <Button
@@ -289,12 +349,53 @@ const CustomerServices = () => {
           {customer.branches.map((branch: Branch) => (
             <Card
               key={branch.id}
-              className="cursor-pointer hover:border-primary transition-colors"
-              onClick={() => { setSelectedBranch(branch); setSelectedQuarter(null); }}
+              className="relative cursor-pointer hover:border-primary transition-colors"
+              onClick={(e) => {
+                if (!(e.target as HTMLElement).closest(".branch-dropdown-trigger")) {
+                  setSelectedBranch(branch);
+                  setSelectedQuarter(null);
+                }
+              }}
             >
               <CardHeader className="p-4 pb-2 flex-row flex items-center gap-4">
                 <Folder className="h-6 w-6 mr-2 text-primary" />
                 <CardTitle className="text-lg">{branch.name}</CardTitle>
+                <div className="ml-auto">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="branch-dropdown-trigger"
+                        onClick={e => e.stopPropagation()}
+                      >
+                        <MoreVertical className="h-5 w-5" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onClick={e => {
+                          e.stopPropagation();
+                          setEditingBranch(branch);
+                          setEditBranchName(branch.name);
+                        }}
+                      >
+                        <Edit className="mr-2 h-4 w-4" />
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowDeleteBranchDialog(true);
+                          setBranchToDelete(branch);
+                        }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
               </CardHeader>
               <CardContent className="p-4 pt-0">
                 <div className="text-sm text-muted-foreground">
@@ -309,10 +410,11 @@ const CustomerServices = () => {
       )}
 
       {renderAddBranchDialog()}
+      {renderEditBranchDialog()}
+      {renderDeleteBranchDialog()}
     </div>
   );
 
-  // --- Renders service management view for a branch ---
   const renderBranchServicesView = () => {
     if (!selectedBranch) return null;
 
@@ -478,7 +580,6 @@ const CustomerServices = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Upload Dialog */}
         <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
           <DialogContent>
             <DialogHeader>
@@ -534,21 +635,17 @@ const CustomerServices = () => {
     )
   };
 
-  // --- Rendering logic ---
   if (!customer) {
     return <div className="p-8 text-center">Loading customer details...</div>;
   }
 
-  // If no branch selected, show branch picker
   if (!selectedBranch) {
     return renderBranchesView();
   }
 
-  // Branch selected? Show branch services view
   return renderBranchServicesView();
 };
 
-// Component for the service date input
 const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor: string }) => (
   <label htmlFor={htmlFor} className="block text-sm font-medium text-gray-700 mb-1">
     {children}
@@ -556,4 +653,3 @@ const Label = ({ children, htmlFor }: { children: React.ReactNode; htmlFor: stri
 );
 
 export default CustomerServices;
-
