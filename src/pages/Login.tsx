@@ -153,7 +153,7 @@ const Login = () => {
           </div>
         </div>
         
-        <h1 className="text-3xl font-bold text-center mb-1 text-gray-800">AC Services</h1>
+        <h1 className="text-3xl font-bold text-center mb-1 text-gray-800">SLV CLIMATE SOLUTIONS</h1>
         <p className="text-center text-gray-500 mb-6">Attendance & Service Management</p>
         
         <Card className="w-full">

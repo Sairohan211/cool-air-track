@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -52,7 +51,6 @@ const AdminAMCCustomers = () => {
 
   const handleCustomerClick = (customer: Customer) => {
     setSelectedCustomer(customer);
-    // Instead of showing quarters directly, navigate to a service selection page
     navigate(`/admin/amc-customers/${customer.id}`);
   };
 
@@ -69,7 +67,6 @@ const AdminAMCCustomers = () => {
         return { 
           ...customer, 
           name: newCustomerName || customer.name,
-          // If we had actual file upload functionality, we would handle the logo update here
         };
       }
       return customer;
@@ -101,8 +98,8 @@ const AdminAMCCustomers = () => {
     const newCustomer: Customer = {
       id: customers.length + 1,
       name: newCustomerName,
-      logo: "/placeholder.svg", // Default logo
-      password: "12345678", // Default password
+      logo: "/placeholder.svg",
+      password: "12345678",
       quarters: [false, false, false, false]
     };
     
@@ -123,7 +120,6 @@ const AdminAMCCustomers = () => {
     setPasswordError(false);
   };
 
-  // Renders the main customer list
   const renderCustomerList = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center mb-6">
@@ -169,7 +165,7 @@ const AdminAMCCustomers = () => {
                 className="w-full"
                 onClick={() => handleCustomerClick(customer)}
               >
-                View Services
+                View Branches
               </Button>
             </CardContent>
           </Card>
@@ -178,7 +174,6 @@ const AdminAMCCustomers = () => {
     </div>
   );
 
-  // Edit Customer Dialog
   const renderEditCustomerDialog = () => (
     <Dialog open={!!editCustomer} onOpenChange={(open) => !open && setEditCustomer(null)}>
       <DialogContent>
@@ -245,7 +240,6 @@ const AdminAMCCustomers = () => {
     </Dialog>
   );
 
-  // Add New Customer Dialog
   const renderAddCustomerDialog = () => (
     <Dialog open={addingNew} onOpenChange={setAddingNew}>
       <DialogContent>
