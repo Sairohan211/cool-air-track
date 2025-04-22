@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -142,30 +141,30 @@ const AdminAMCCustomers = () => {
   };
 
   const renderCustomerList = () => (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
             AMC Customers
           </h1>
           <p className="text-muted-foreground mt-1">
-            Manage your AMC customer accounts and their services
+            Manage your AMC customer accounts
           </p>
         </div>
         <Button 
           onClick={() => setAddingNew(true)}
-          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+          className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white"
         >
           <PlusCircle className="h-5 w-5" />
           Add New Customer
         </Button>
       </div>
       
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
+      <div className="flex flex-col space-y-4 max-w-3xl mx-auto">
         {customers.map((customer) => (
           <Card 
             key={customer.id} 
-            className="overflow-hidden transition-all duration-200 hover:shadow-lg bg-card/50 backdrop-blur-sm border border-white/10"
+            className="w-full transition-all duration-200 hover:shadow-lg bg-card/50 backdrop-blur-sm border border-purple-800/20"
           >
             <CardHeader className="relative p-4">
               <DropdownMenu>
@@ -188,26 +187,21 @@ const AdminAMCCustomers = () => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <CardTitle className="text-lg font-semibold">{customer.name}</CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="mb-4 flex items-center space-x-4">
-                <div className="h-12 w-12 rounded-full overflow-hidden bg-secondary/30 p-2">
+              <div className="flex items-center space-x-4">
+                <div className="h-10 w-10 rounded-md overflow-hidden bg-secondary/30 p-1.5">
                   <img 
                     src={customer.logo} 
                     alt={`${customer.name} logo`} 
                     className="h-full w-full object-contain" 
                   />
                 </div>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    Active Quarters: {customer.quarters.filter(Boolean).length}
-                  </p>
-                </div>
+                <CardTitle className="text-lg font-semibold">{customer.name}</CardTitle>
               </div>
+            </CardHeader>
+            <CardContent className="pt-0 pb-4 px-4">
               <Button 
                 variant="secondary" 
-                className="w-full hover:bg-secondary/80"
+                className="w-full hover:bg-purple-900/20"
                 onClick={() => handleCustomerClick(customer)}
               >
                 View Details
