@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, 
@@ -15,7 +14,11 @@ import {
 } from "recharts";
 import { UserCheck, FileText, Store, CheckCheck, Clock } from 'lucide-react';
 
-// Mock data for recent services
+const currentUser = {
+  name: "John Doe",
+  role: "Admin"
+};
+
 const recentServices = [
   {
     id: 1,
@@ -51,14 +54,12 @@ const recentServices = [
   }
 ];
 
-// Mock data for store distribution
 const storeServiceData = [
   { name: "Lifestyle", value: 35 },
   { name: "Max", value: 40 },
   { name: "Easy", value: 25 }
 ];
 
-// Mock data for service type breakdown
 const serviceTypeData = [
   { name: "Installation", value: 20 },
   { name: "Servicing", value: 45 },
@@ -66,7 +67,6 @@ const serviceTypeData = [
   { name: "Maintenance", value: 10 }
 ];
 
-// Mock data for weekly service trend
 const weeklyTrendData = [
   { day: "Mon", services: 8 },
   { day: "Tue", services: 12 },
@@ -77,7 +77,6 @@ const weeklyTrendData = [
   { day: "Sun", services: 2 }
 ];
 
-// Colors for charts
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 const AdminDashboard = () => {
@@ -93,7 +92,15 @@ const AdminDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">Admin Dashboard</h1>
+        <div className="mb-6">
+          <p className="text-xl text-muted-foreground">
+            Namaste 🙏 Welcome back,
+          </p>
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
+            {currentUser.name}
+          </h1>
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight">Dashboard Overview</h2>
         <p className="text-muted-foreground">
           Overview of technician activities and services
         </p>

@@ -213,13 +213,49 @@ const AdminAMCCustomers = () => {
     </div>
   );
 
+  const handleEditBranch = () => {
+    if (!editCustomer) return;
+    
+    if (password !== editCustomer.password) {
+      setPasswordError(true);
+      toast({
+        title: "Authentication Error",
+        description: "Please enter the correct password to edit branch details",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const updatedCustomers = customers.map(customer => {
+      if (customer.id === editCustomer.id) {
+        return { 
+          ...customer, 
+          name: newCustomerName || customer.name,
+        };
+      }
+      return customer;
+    });
+    
+    setCustomers(updatedCustomers);
+    setEditCustomer(null);
+    setPassword("");
+    setNewCustomerName("");
+    setLogoFile(null);
+    setPasswordError(false);
+    
+    toast({
+      title: "Customer updated",
+      description: "Customer details have been updated successfully",
+    });
+  };
+
   const renderEditCustomerDialog = () => (
     <Dialog open={!!editCustomer} onOpenChange={(open) => !open && setEditCustomer(null)}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Customer</DialogTitle>
+          <DialogTitle>Edit Customer Branch</DialogTitle>
           <DialogDescription>
-            Make changes to the customer's information.
+            Please enter your password to make changes to branch information.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4 py-4">
@@ -254,7 +290,7 @@ const AdminAMCCustomers = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="password">Confirm Password</Label>
+            <Label htmlFor="password" className="font-medium">Enter Password to Confirm</Label>
             <Input 
               id="password" 
               type="password" 
@@ -263,7 +299,7 @@ const AdminAMCCustomers = () => {
                 setPassword(e.target.value);
                 setPasswordError(false);
               }} 
-              placeholder="Enter password to confirm changes"
+              placeholder="Enter your password"
               className={passwordError ? "border-red-500" : ""}
             />
             {passwordError && (
@@ -273,7 +309,7 @@ const AdminAMCCustomers = () => {
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setEditCustomer(null)}>Cancel</Button>
-          <Button onClick={handleEditCustomer}>Save Changes</Button>
+          <Button onClick={handleEditBranch}>Save Changes</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
