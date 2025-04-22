@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -142,57 +143,74 @@ const AdminAMCCustomers = () => {
 
   const renderCustomerList = () => (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold tracking-tight">AMC Customers</h1>
+      <div className="flex justify-between items-center mb-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+            AMC Customers
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage your AMC customer accounts and their services
+          </p>
+        </div>
         <Button 
           onClick={() => setAddingNew(true)}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
         >
           <PlusCircle className="h-5 w-5" />
           Add New Customer
         </Button>
       </div>
       
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
         {customers.map((customer) => (
-          <Card key={customer.id} className="overflow-hidden">
-            <CardHeader className="relative p-4 pb-0">
+          <Card 
+            key={customer.id} 
+            className="overflow-hidden transition-all duration-200 hover:shadow-lg bg-card/50 backdrop-blur-sm border border-white/10"
+          >
+            <CardHeader className="relative p-4">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="absolute right-2 top-2">
-                    <MoreVertical className="h-5 w-5" />
+                    <MoreVertical className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="end">
                   <DropdownMenuItem onClick={() => startEdit(customer)}>
                     <Edit className="mr-2 h-4 w-4" />
                     Edit
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => setDeleteCustomer(customer)}
-                    className="text-red-600 focus:text-red-600"
+                    className="text-destructive focus:text-destructive"
                   >
                     <Trash2 className="mr-2 h-4 w-4" />
                     Delete
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              <CardTitle className="text-xl">{customer.name}</CardTitle>
+              <CardTitle className="text-lg font-semibold">{customer.name}</CardTitle>
             </CardHeader>
-            <CardContent className="p-4 pt-2">
-              <div className="mb-4 flex justify-center">
-                <img 
-                  src={customer.logo} 
-                  alt={`${customer.name} logo`} 
-                  className="h-24 w-auto object-contain" 
-                />
+            <CardContent className="p-4 pt-0">
+              <div className="mb-4 flex items-center space-x-4">
+                <div className="h-12 w-12 rounded-full overflow-hidden bg-secondary/30 p-2">
+                  <img 
+                    src={customer.logo} 
+                    alt={`${customer.name} logo`} 
+                    className="h-full w-full object-contain" 
+                  />
+                </div>
+                <div className="space-y-1">
+                  <p className="text-sm text-muted-foreground">
+                    Active Quarters: {customer.quarters.filter(Boolean).length}
+                  </p>
+                </div>
               </div>
               <Button 
-                variant="outline" 
-                className="w-full"
+                variant="secondary" 
+                className="w-full hover:bg-secondary/80"
                 onClick={() => handleCustomerClick(customer)}
               >
-                View Branches
+                View Details
               </Button>
             </CardContent>
           </Card>
@@ -345,7 +363,7 @@ const AdminAMCCustomers = () => {
   );
 
   return (
-    <div className="container mx-auto p-4 md:p-6">
+    <div className="container mx-auto py-8 px-4">
       {renderCustomerList()}
       {renderEditCustomerDialog()}
       {renderDeleteDialog()}
