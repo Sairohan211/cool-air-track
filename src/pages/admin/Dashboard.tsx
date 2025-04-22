@@ -13,73 +13,86 @@ import {
   Legend
 } from "recharts";
 import { UserCheck, FileText, Store, CheckCheck, Clock } from 'lucide-react';
-
-const currentUser = {
-  name: "John Doe",
-  role: "Admin"
-};
-
-const recentServices = [
-  {
-    id: 1,
-    technician: "John Doe",
-    store: "Lifestyle",
-    branch: "Hyderabad Central",
-    type: "Installation",
-    date: "2023-04-15T10:30:00"
-  },
-  {
-    id: 2,
-    technician: "Jane Smith",
-    store: "Max",
-    branch: "Hitech City",
-    type: "Servicing",
-    date: "2023-04-15T09:15:00"
-  },
-  {
-    id: 3,
-    technician: "Mike Johnson",
-    store: "Easy",
-    branch: "Ameerpet",
-    type: "Repair",
-    date: "2023-04-14T14:00:00"
-  },
-  {
-    id: 4,
-    technician: "Sarah Williams",
-    store: "Lifestyle",
-    branch: "Secundrabad",
-    type: "Maintenance",
-    date: "2023-04-14T11:45:00"
-  }
-];
-
-const storeServiceData = [
-  { name: "Lifestyle", value: 35 },
-  { name: "Max", value: 40 },
-  { name: "Easy", value: 25 }
-];
-
-const serviceTypeData = [
-  { name: "Installation", value: 20 },
-  { name: "Servicing", value: 45 },
-  { name: "Repair", value: 25 },
-  { name: "Maintenance", value: 10 }
-];
-
-const weeklyTrendData = [
-  { day: "Mon", services: 8 },
-  { day: "Tue", services: 12 },
-  { day: "Wed", services: 10 },
-  { day: "Thu", services: 15 },
-  { day: "Fri", services: 18 },
-  { day: "Sat", services: 6 },
-  { day: "Sun", services: 2 }
-];
-
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+import { useEffect, useState } from "react";
 
 const AdminDashboard = () => {
+  const [currentUser, setCurrentUser] = useState({
+    name: "",
+    role: "Admin"
+  });
+
+  useEffect(() => {
+    // Get the admin name from localStorage
+    const adminName = localStorage.getItem('adminName');
+    
+    if (adminName) {
+      setCurrentUser(prev => ({
+        ...prev,
+        name: adminName
+      }));
+    }
+  }, []);
+
+  const recentServices = [
+    {
+      id: 1,
+      technician: "John Doe",
+      store: "Lifestyle",
+      branch: "Hyderabad Central",
+      type: "Installation",
+      date: "2023-04-15T10:30:00"
+    },
+    {
+      id: 2,
+      technician: "Jane Smith",
+      store: "Max",
+      branch: "Hitech City",
+      type: "Servicing",
+      date: "2023-04-15T09:15:00"
+    },
+    {
+      id: 3,
+      technician: "Mike Johnson",
+      store: "Easy",
+      branch: "Ameerpet",
+      type: "Repair",
+      date: "2023-04-14T14:00:00"
+    },
+    {
+      id: 4,
+      technician: "Sarah Williams",
+      store: "Lifestyle",
+      branch: "Secundrabad",
+      type: "Maintenance",
+      date: "2023-04-14T11:45:00"
+    }
+  ];
+
+  const storeServiceData = [
+    { name: "Lifestyle", value: 35 },
+    { name: "Max", value: 40 },
+    { name: "Easy", value: 25 }
+  ];
+
+  const serviceTypeData = [
+    { name: "Installation", value: 20 },
+    { name: "Servicing", value: 45 },
+    { name: "Repair", value: 25 },
+    { name: "Maintenance", value: 10 }
+  ];
+
+  const weeklyTrendData = [
+    { day: "Mon", services: 8 },
+    { day: "Tue", services: 12 },
+    { day: "Wed", services: 10 },
+    { day: "Thu", services: 15 },
+    { day: "Fri", services: 18 },
+    { day: "Sat", services: 6 },
+    { day: "Sun", services: 2 }
+  ];
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
