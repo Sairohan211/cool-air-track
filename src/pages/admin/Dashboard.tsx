@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   BarChart, 
@@ -109,7 +110,7 @@ const AdminDashboard = () => {
           <p className="text-xl text-muted-foreground">
             Namaste 🙏 Welcome back,
           </p>
-          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-purple-600">
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-acblue-500 to-acblue-700">
             {currentUser.name}
           </h1>
         </div>
@@ -120,12 +121,12 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="border-l-4 border-l-acblue-500">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Technicians
             </CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+            <UserCheck className="h-4 w-4 text-acblue-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">12</div>
@@ -135,12 +136,12 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-l-4 border-l-acblue-400">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Services This Week
             </CardTitle>
-            <FileText className="h-4 w-4 text-muted-foreground" />
+            <FileText className="h-4 w-4 text-acblue-400" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">71</div>
@@ -150,12 +151,12 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-l-4 border-l-acblue-600">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Total Stores
             </CardTitle>
-            <Store className="h-4 w-4 text-muted-foreground" />
+            <Store className="h-4 w-4 text-acblue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">9</div>
@@ -165,12 +166,12 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card>
+        <Card className="border-l-4 border-l-acblue-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               Attendance Rate
             </CardTitle>
-            <CheckCheck className="h-4 w-4 text-muted-foreground" />
+            <CheckCheck className="h-4 w-4 text-acblue-300" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">94%</div>
@@ -182,7 +183,7 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+        <Card className="col-span-4 border border-gray-700/10 shadow-md">
           <CardHeader>
             <CardTitle>Weekly Service Trend</CardTitle>
             <CardDescription>
@@ -205,7 +206,7 @@ const AdminDashboard = () => {
                   />
                   <Bar 
                     dataKey="services" 
-                    fill="hsl(var(--primary))" 
+                    fill="#0080ff" 
                     radius={[4, 4, 0, 0]} 
                   />
                 </BarChart>
@@ -214,7 +215,7 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="col-span-3">
+        <Card className="col-span-3 border border-gray-700/10 shadow-md">
           <CardHeader>
             <CardTitle>Recent Services</CardTitle>
             <CardDescription>
@@ -224,9 +225,9 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="space-y-4">
               {recentServices.map(service => (
-                <div key={service.id} className="flex items-center">
-                  <div className="mr-4 rounded-full p-2 bg-primary/10">
-                    <Clock className="h-4 w-4 text-primary" />
+                <div key={service.id} className="flex items-center p-2 rounded-lg hover:bg-gray-800/5 transition-colors">
+                  <div className="mr-4 rounded-full p-2 bg-acblue-500/10">
+                    <Clock className="h-4 w-4 text-acblue-500" />
                   </div>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">
@@ -247,14 +248,14 @@ const AdminDashboard = () => {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
+        <Card className="border border-gray-700/10 shadow-md">
+          <CardHeader className="border-b border-gray-700/10 pb-3">
             <CardTitle>Store Distribution</CardTitle>
             <CardDescription>
               Services by store franchise
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -272,7 +273,7 @@ const AdminDashboard = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Legend />
+                  <Legend layout="horizontal" verticalAlign="bottom" align="center" />
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
@@ -280,14 +281,14 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader>
+        <Card className="border border-gray-700/10 shadow-md">
+          <CardHeader className="border-b border-gray-700/10 pb-3">
             <CardTitle>Service Type Breakdown</CardTitle>
             <CardDescription>
               Distribution of service types
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="h-[300px]">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -305,7 +306,7 @@ const AdminDashboard = () => {
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
-                  <Legend />
+                  <Legend layout="horizontal" verticalAlign="bottom" align="center" />
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
